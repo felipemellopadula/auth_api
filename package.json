@@ -2,6 +2,9 @@
   "name": "be_s",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": "20.13.1"
+  }
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "npx tsc",

@@ -8,7 +8,7 @@ router.post('/register', register);
 router.post('/login', login);
 router.get('/', authenticateToken, getUsers);
 router.get('/:id', authenticateToken, getOneUser);
-router.put('/:id', authenticateToken, updateUser); // Rota para atualizar um usuário
-router.delete('/:id', authenticateToken, deleteUser); // Rota para deletar um usuário
+router.put('/:id', authenticateToken, updateUser);
+router.delete('/:id', authenticateToken, deleteUser);
 
 export default router;

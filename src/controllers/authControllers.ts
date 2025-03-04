@@ -1,6 +1,14 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { registerUser, loginUser, getAllUsers, getUserById, updateUserInDB, deleteUserInDB } from '../services/authService';
-import { registerSchema } from '../schemas/userSchema';
+import { registerSchema, updateUserSchema } from '../schemas/userSchema';
+
+
+// Define a custom Request interface that extends the base Request
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: number;
+  };
+}
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -43,13 +51,14 @@ export const getUsers = async (_req: Request, res: Response) => {
   }
 };
 
-export const getOneUser = async (req: Request, res: Response) => {
+export const getOneUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = parseInt(req.params.id);
     const user = await getUserById(userId);
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: 'User not found' });
+      return; // Sai da função, retornando void
     }
 
     res.status(200).json({ user });
@@ -62,21 +71,21 @@ export const getOneUser = async (req: Request, res: Response) => {
   }
 };
 
-// Novo controlador para atualizar um usuário
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = parseInt(req.params.id);
 
-    // Verifica se o ID do usuário na rota corresponde ao ID do usuário autenticado
     if (req.user?.userId !== userId) {
-      return res.status(403).json({ error: 'You can only update your own account' });
+      res.status(403).json({ error: 'You can only update your own account' });
+      return; // Sai da função, retornando void
     }
 
     const updatedData = req.body;
     const updatedUser = await updateUserInDB(userId, updatedData);
 
     if (!updatedUser) {
-      return res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: 'User not found' });
+      return; // Sai da função, retornando void
     }
 
     res.status(200).json({ message: 'User updated successfully', user: updatedUser });
@@ -89,19 +98,20 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = parseInt(req.params.id);
 
-    // Verifica se o ID do usuário na rota corresponde ao ID do usuário autenticado
     if (req.user?.userId !== userId) {
-      return res.status(403).json({ error: 'You can only delete your own account' });
+      res.status(403).json({ error: 'You can only delete your own account' });
+      return; // Sai da função, retornando void
     }
 
     const deletedUser = await deleteUserInDB(userId);
 
     if (!deletedUser) {
-      return res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: 'User not found' });
+      return; // Sai da função, retornando void
     }
 
     res.status(200).json({ message: 'User deleted successfully' });

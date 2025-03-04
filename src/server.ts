@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import errorHandler from './middlewares/errorHandler';
+import cors from "cors";
 
 
 dotenv.config();
@@ -12,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middlewares globais
 app.use(helmet());
+app.use(cors());
 app.use(express.json());
 
 // Rotas

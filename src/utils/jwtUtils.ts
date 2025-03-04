@@ -1,20 +1,25 @@
-// jwtUtils.ts
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
-// No need for a separate interface 
-// This augments the existing Express Request interface
+// Define a custom interface for the decoded token
+interface DecodedToken {
+  userId: number;
+  iat?: number;
+  exp?: number;
+}
+
+// Extend the Express Request interface to include the user property
 declare global {
   namespace Express {
     interface Request {
-      user?: any; // or a more specific type like { userId: number }
+      user?: DecodedToken;
     }
   }
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
 
-export const generateToken = (userId: number) => {
+export const generateToken = (userId: number): string => {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '1h' });
 };
 
@@ -22,17 +27,23 @@ export const authenticateToken = (
   req: Request, 
   res: Response, 
   next: NextFunction
-) => {
+): void => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return res.status(401).json({ error: 'Access token is required' });
+  if (!token) {
+    res.status(401).json({ error: 'Access token is required' });
+    return;
+  }
 
-  jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
-    if (err) return res.status(403).json({ error: 'Invalid or expired token' });
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      res.status(403).json({ error: 'Invalid or expired token' });
+      return;
+    }
     
-    // Attach the decoded token to the request object
-    req.user = decoded;
+    // Type assertion to ensure decoded matches DecodedToken
+    req.user = decoded as DecodedToken;
     next();
   });
 };

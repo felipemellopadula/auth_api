@@ -18,14 +18,14 @@ export const registerUser = async (data: RegisterInput) => {
 
 export const loginUser = async (email: string, password: string) => {
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) throw new Error('User not found');
+  if (!user) throw new Error('Usuário não encontrado');
 
   if (user.password === null) {
-    throw new Error('User does not have a password set. Please use Google login.');
+    throw new Error('Usuário não tem senha definida. Use login com Google.');
   }
 
   const isValidPassword = await bcrypt.compare(password, user.password);
-  if (!isValidPassword) throw new Error('Invalid password');
+  if (!isValidPassword) throw new Error('Senha inválida');
 
   const token = generateToken(user.id);
   return { user, token };

@@ -20,12 +20,14 @@ export const loginUser = async (email: string, password: string) => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw new Error('User not found');
 
+  if (user.password === null) {
+    throw new Error('User does not have a password set. Please use Google login.');
+  }
+
   const isValidPassword = await bcrypt.compare(password, user.password);
   if (!isValidPassword) throw new Error('Invalid password');
 
-  // Linha 26 corrigida: remover String() e passar user.id como number
   const token = generateToken(user.id);
-
   return { user, token };
 };
 

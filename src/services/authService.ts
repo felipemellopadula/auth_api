@@ -23,7 +23,9 @@ export const loginUser = async (email: string, password: string) => {
   const isValidPassword = await bcrypt.compare(password, user.password);
   if (!isValidPassword) throw new Error('Invalid password');
 
+  // Linha 26 corrigida: remover String() e passar user.id como number
   const token = generateToken(user.id);
+
   return { user, token };
 };
 
@@ -37,7 +39,6 @@ export const getAllUsers = async () => {
       password: false,
     },
   });
-  
   return users;
 };
 
@@ -52,7 +53,6 @@ export const getUserById = async (userId: number) => {
       password: false,
     },
   });
-
   return user;
 };
 
@@ -61,15 +61,12 @@ export const updateUserInDB = async (userId: number, data: any) => {
     where: { id: userId },
     data,
   });
-
   return updatedUser;
 };
 
-// Novo serviço para deletar um usuário
 export const deleteUserInDB = async (userId: number) => {
   const deletedUser = await prisma.user.delete({
     where: { id: userId },
   });
-
   return deletedUser;
 };

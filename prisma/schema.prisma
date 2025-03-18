@@ -12,7 +12,7 @@ model User {
   name         String
   email        String    @unique
   phone        String    @unique
-  password     String
+  password     String?   // Tornar opcional
   subscription String    @default("free") // "free" ou "premium"
   history      String[]  @default([])
   createdAt    DateTime  @default(now())

@@ -1,8 +1,32 @@
-import { app } from "./app";
+import express from 'express';
+import helmet from 'helmet';
+import dotenv from 'dotenv';
+import authRoutes from './routes/authRoutes';
+import errorHandler from './middlewares/errorHandler';
+import cors from "cors";
 
+
+dotenv.config();
+
+const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middlewares globais
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
-app.listen(PORT, () => {
-  console.log(`API sucessfully started at port ${PORT}`);
-});
+// Rotas
+app.use('/api/auth', authRoutes);
+
+// Middleware de tratamento de erros
+app.use(errorHandler);
+
+// Inicialização do servidor
+const startServer = () => {
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+  });
+};
+
+export default startServer;

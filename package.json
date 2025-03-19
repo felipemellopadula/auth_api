@@ -11,7 +11,8 @@
     "start": "node dist/server.js",
     "migrate:dev": "dotenv -e .env.develop -- npx prisma migrate dev",
     "studio:env": "dotenv -e .env.develop -- npx prisma studio",
-    "migrate:deploy": "npx prisma migrate deploy"
+    "migrate:deploy": "npx prisma migrate deploy",
+    "postinstall": "prisma generate && npm run build"
   },
   "keywords": [],
   "author": "",

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../utils/jwtUtils';
 import { registerSchema, updateUserSchema } from '../schemas/userSchema';
@@ -18,12 +18,20 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Função para login com Google
 export const googleLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  console.log('req.body:', req.body); // Adicione este log para depurar
+
   try {
-    const { token } = req.body; // O frontend deve enviar o token do Google
+    const { token, credential } = req.body; // Aceita tanto "token" quanto "credential"
+    const googleToken = token || credential; // Usa o que estiver presente
+
+    if (!googleToken) {
+      res.status(400).json({ error: 'Google token is required' });
+      return;
+    }
 
     // Verificar o token do Google
     const ticket = await client.verifyIdToken({
-      idToken: token,
+      idToken: googleToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
@@ -47,7 +55,6 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
         data: {
           name: name || 'Google User',
           email,
-          phone: '',
           password: defaultPassword,
           subscription: 'free',
         },
@@ -63,14 +70,11 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
   } catch (error) {
     if (error instanceof Error) {
       res.status(401).json({ error: error.message });
-      next(error); // Passa o erro para o middleware de erro
     } else {
       res.status(401).json({ error: 'An unexpected error occurred' });
-      next(error);
     }
   }
 };
-
 // Outras funções (mantidas como estão, mas ajustadas para incluir `next`)
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

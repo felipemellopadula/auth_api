@@ -15,3 +15,7 @@ export const updateUserSchema = z.object({
   phone: z.string().regex(/^\d{10,15}$/, 'Invalid phone number').optional(),
   password: z.string().min(6, 'Password must be at least 6 characters').optional(),
 });
+
+export const googleLoginSchema = z.object({
+  token: z.string().min(1, 'Google token is required'),
+});

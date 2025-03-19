@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/app.js",
     "migrate:dev": "dotenv -e .env.develop -- npx prisma migrate dev",
     "studio:env": "dotenv -e .env.develop -- npx prisma studio",
     "migrate:deploy": "npx prisma migrate deploy",
